@@ -18,6 +18,9 @@ fmt:
 vet:
 	go vet ./pkg/... ./cmd/...
 
+manifests:
+	go run vendor/sigs.k8s.io/controller-tools/cmd/controller-gen/main.go all
+
 # Generate code
 generate:
 ifndef GOPATH
