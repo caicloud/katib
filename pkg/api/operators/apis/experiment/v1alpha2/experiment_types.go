@@ -44,9 +44,6 @@ type ExperimentSpec struct {
 	// Max failed trials to mark experiment as failed.
 	MaxFailedTrialCount *int `json:"maxFailedTrialCount,omitempty"`
 
-	// Whether to retain historical data in DB after deletion.
-	RetainHistoricalData bool `json:"retainHistoricalData,omitempty"`
-
 	// TODO - figure out what to do with metric collectors
 	MetricsCollectorType string `json:"metricsCollectorSpec,omitempty"`
 
@@ -78,6 +75,8 @@ type ExperimentStatus struct {
 
 	// Current optimal trial parameters and observations.
 	CurrentOptimalTrial OptimalTrial `json:"currentOptimalTrial,omitempty"`
+
+	Trials int `json:"trials,omitempty"`
 
 	// How many trials have succeeded.
 	TrialsSucceeded int `json:"trialsSucceeded,omitempty"`
@@ -129,6 +128,9 @@ type ExperimentCondition struct {
 type ExperimentConditionType string
 
 const (
+	ExperimentAvailable ExperimentConditionType = "Available"
+	ExperimentCompleted ExperimentConditionType = "Completed"
+
 	ExperimentCreated    ExperimentConditionType = "Created"
 	ExperimentRunning    ExperimentConditionType = "Running"
 	ExperimentRestarting ExperimentConditionType = "Restarting"
