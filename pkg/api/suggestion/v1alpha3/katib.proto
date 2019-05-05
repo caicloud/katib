@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package api.v1.alpha3;
+
+import "google/api/annotations.proto";
+
+service KatibSuggestion {
+    rpc GetSuggestions(GetKatibSuggestionsRequest) returns (GetKatibSuggestionsReply);
+}
+
+message GetKatibSuggestionsRequest {}
+
+message GetKatibSuggestionsReply {}
