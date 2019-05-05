@@ -47,5 +47,7 @@ func (r *ReconcileExperiment) handle(experiment *experimentv1alpha2.Experiment) 
 		}
 	}
 
+	// TODO(gaocegege): Update best trial.
+
 	return result, err
 }
