@@ -16,13 +16,17 @@ limitations under the License.
 package v1alpha2
 
 import (
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type TrialSpec struct {
 	// Key-value pairs for hyperparameters and assignment values.
 	ParameterAssignments []ParameterAssignment `json:"parameterAssignments"`
+
+	Objective        string   `json:"objective"`
+	Metrics          []string `json:"metrics"`
+	MetricsCollector string   `json:"metricCollector"`
 
 	// Raw text for the trial run spec. This can be any generic Kubernetes
 	// runtime object. The trial operator should create the resource as written,
@@ -51,7 +55,7 @@ type TrialStatus struct {
 	Conditions []TrialCondition `json:"conditions,omitempty"`
 
 	// Results of the Trial - objectives and other metrics values.
-	Observation Observation `json:"observation,omitempty"`
+	Observation *Observation `json:"observation,omitempty"`
 }
 
 type ParameterAssignment struct {
@@ -65,8 +69,10 @@ type Metric struct {
 }
 
 type Observation struct {
+	// Objective is objective name and value.
+	Objective *Metric `json:"objective,omitempty"`
 	// Key-value pairs for metric names and values
-	Metrics []Metric `json:"metrics"`
+	Metrics []Metric `json:"metrics,omitempty"`
 }
 
 // +k8s:deepcopy-gen=true

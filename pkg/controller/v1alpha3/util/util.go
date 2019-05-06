@@ -5,8 +5,12 @@ const (
 	FlagCreate = "create"
 	FlagDelete = "delete"
 
-	TypeTrial = "Trial"
+	TypeTrial      = "Trial"
+	TypeTFJob      = "TFJob"
+	TypePyTorchJob = "PyTorchJob"
 
 	LabelExperiment = "experiment-name"
 	LabelTrial      = "trial-name"
+
+	FailReason = "Failed"
 )

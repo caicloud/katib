@@ -1,0 +1,29 @@
+apiVersion: kubeflow.org/v1alpha2
+kind: Trial
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: sample
+spec:
+  objective: accuracy
+  metrics:
+    - loss
+  MetricsCollector: general
+  parameterAssignments:
+    - name: param1
+      value: "1.2345"
+  runSpec: |-
+    apiVersion: "kubeflow.org/v1beta1"
+    kind: "TFJob"
+    metadata:
+      name: "dist-mnist-for-e2e-test"
+    spec:
+      tfReplicaSpecs:
+        Worker:
+          replicas: 1
+          restartPolicy: Never
+          template:
+            spec:
+              containers:
+                - name: tensorflow
+                  image: gaocegege/mnist:1
