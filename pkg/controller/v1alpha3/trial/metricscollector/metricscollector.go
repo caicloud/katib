@@ -95,7 +95,6 @@ func (d *GeneralMetricsCollector) parseLogs(trial *trialv1alpha2.Trial, logs []s
 		Name:      trial.Name,
 	}.String())
 
-	logger.V(0).Info("DEBUG-parselogs", "len", len(logs), "last", logs[len(logs)-1])
 	for _, logline := range logs {
 		value, ok := canGet(logline, objectiveValueName)
 		if ok {
@@ -117,7 +116,6 @@ func (d *GeneralMetricsCollector) parseLogs(trial *trialv1alpha2.Trial, logs []s
 			}
 		}
 	}
-	logger.V(0).Info("DEBUG-???????")
 	return nil
 }
 

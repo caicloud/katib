@@ -34,12 +34,10 @@ func (r *ReconcileTrial) handle(trial *trialv1alpha2.Trial) (result reconcile.Re
 	case tfv1beta1.Kind:
 		// If the trial is succeeded, update the final metrics.
 		if hasCondition(trial.Status, trialv1alpha2.TrialSucceeded, corev1.ConditionTrue) {
-			logger.Info("DEBUG-CollectFinalMetric", "trial", trial.Status)
 			if err = r.CollectFinalMetric(trial); err != nil {
 				r.reportError(trial, err, "Fail to collect the metrics", util.FailReason)
 				return result, err
 			}
-			logger.Info("DEBUG-AfterCollectFinalMetric", "trial", trial.Status)
 			return result, err
 		}
 
