@@ -31,14 +31,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	suggestionsv1alpha2 "github.com/kubeflow/katib/pkg/api/operators/apis/suggestion/v1alpha2"
-	"github.com/kubeflow/katib/pkg/controller/v1alpha3/recorder"
+	"github.com/kubeflow/katib/pkg/controller/v1alpha3/suggestion/clientset"
 )
 
 const (
 	controllerName = "suggestion-controller"
 )
 
-var log = logf.Log.WithName("controller")
+var log = logf.Log.WithName(controllerName)
 
 // Add creates a new Suggestion Controller and adds it to the Manager with default RBAC. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
@@ -48,7 +48,12 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileSuggestion{Client: mgr.GetClient(), scheme: mgr.GetScheme()}
+	r := &ReconcileSuggestion{
+		Client: mgr.GetClient(),
+		scheme: mgr.GetScheme(),
+	}
+	r.DeploymentClient = clientset.New(r.Client)
+	return r
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -82,8 +87,9 @@ var _ reconcile.Reconciler = &ReconcileSuggestion{}
 // ReconcileSuggestion reconciles a Suggestion object
 type ReconcileSuggestion struct {
 	client.Client
-	recorder.Recorder
+	// recorder.Recorder
 	scheme *runtime.Scheme
+	clientset.DeploymentClient
 }
 
 // Reconcile reads that state of the cluster for a Suggestion object and makes changes based on the state read
