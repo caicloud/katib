@@ -9,14 +9,21 @@ import (
 func createOrUpdateCondition(suggestionStatus *suggestionv1alpha2.SuggestionStatus,
 	conditionType suggestionv1alpha2.SuggestionConditionType,
 	conditionStatus corev1.ConditionStatus) {
+	createOrUpdateConditionWithReason(suggestionStatus, conditionType, conditionStatus, "", "")
+}
+
+func createOrUpdateConditionWithReason(suggestionStatus *suggestionv1alpha2.SuggestionStatus,
+	conditionType suggestionv1alpha2.SuggestionConditionType,
+	conditionStatus corev1.ConditionStatus,
+	reason, message string) {
 	conditions := suggestionStatus.Conditions
 	for i, cond := range conditions {
 		if cond.Type == conditionType {
-			updateCondition(&suggestionStatus.Conditions[i], conditionStatus, "", "")
+			updateCondition(&suggestionStatus.Conditions[i], conditionStatus, reason, message)
 			return
 		}
 	}
-	c := createCondition(conditionType, conditionStatus, "", "")
+	c := createCondition(conditionType, conditionStatus, reason, message)
 	suggestionStatus.Conditions = append(suggestionStatus.Conditions, c)
 
 }

@@ -12,6 +12,7 @@ import (
 type Recorder interface {
 	record.EventRecorder
 	ReportChange(o runtime.Object, operator, typ string)
+	ReportError(o runtime.Object, reason, message string)
 }
 
 // GeneralRecorder is the general-purpose implementation of Recorder.
@@ -23,6 +24,10 @@ type GeneralRecorder struct {
 func (g *GeneralRecorder) ReportChange(o runtime.Object, operator, typ string) {
 	msg := fmt.Sprintf("%s the %s", operator, typ)
 	g.EventRecorder.Event(o, corev1.EventTypeNormal, "SuccessfulChange", msg)
+}
+
+func (g *GeneralRecorder) ReportError(o runtime.Object, reason, message string) {
+	g.EventRecorder.Event(o, corev1.EventTypeWarning, reason, message)
 }
 
 // New returns a new Recorder.

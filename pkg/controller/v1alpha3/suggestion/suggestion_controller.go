@@ -31,6 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	suggestionsv1alpha2 "github.com/kubeflow/katib/pkg/api/operators/apis/suggestion/v1alpha2"
+	"github.com/kubeflow/katib/pkg/controller/v1alpha3/recorder"
 	"github.com/kubeflow/katib/pkg/controller/v1alpha3/suggestion/clientset"
 )
 
@@ -49,10 +50,11 @@ func Add(mgr manager.Manager) error {
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
 	r := &ReconcileSuggestion{
-		Client: mgr.GetClient(),
-		scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Recorder: recorder.New(mgr.GetRecorder(controllerName)),
+		scheme:   mgr.GetScheme(),
 	}
-	r.DeploymentClient = clientset.New(r.Client)
+	r.DeploymentClient = clientset.New(r.Client, r.Recorder)
 	return r
 }
 
@@ -87,7 +89,7 @@ var _ reconcile.Reconciler = &ReconcileSuggestion{}
 // ReconcileSuggestion reconciles a Suggestion object
 type ReconcileSuggestion struct {
 	client.Client
-	// recorder.Recorder
+	recorder.Recorder
 	scheme *runtime.Scheme
 	clientset.DeploymentClient
 }
