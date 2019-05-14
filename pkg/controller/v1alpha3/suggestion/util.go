@@ -21,5 +21,10 @@ func getDesiredDeployment(instance *suggestionsv1alpha2.Suggestion) (*appsv1.Dep
 			Template: instance.Spec.Template,
 		},
 	}
+	if deploy.Spec.Template.ObjectMeta.Labels == nil {
+		deploy.Spec.Template.ObjectMeta.Labels = make(map[string]string)
+	}
+	deploy.Spec.Template.ObjectMeta.Labels["deployment"] = instance.Name + "-deployment"
+
 	return deploy, nil
 }

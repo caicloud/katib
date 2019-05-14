@@ -1,0 +1,21 @@
+apiVersion: kubeflow.org/v1alpha2
+kind: Suggestion
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: sample
+spec:
+  replicas: 1
+  type: HyperParameter
+  needHistory: false
+  template:
+    metadata: 
+      name: suggestion-random
+    spec: 
+      containers:
+      - name: suggestion-random
+        image: katib/suggestion-random:latest
+
+
+
+  
