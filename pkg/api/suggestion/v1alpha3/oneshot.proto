@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package api.v1.alpha3;
+
+import "google/api/annotations.proto";
+
+service OneshotSuggestion {
+    rpc GetSuggestions(GetOneshotSuggestionRequest) returns (stream GetOneshotSuggestionReply);
+}
+
+message GetOneshotSuggestionRequest {
+}
+
+message GetOneshotSuggestionReply {
+    bytes onnx_model = 1;
+}
+
+
