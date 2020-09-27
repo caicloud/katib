@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM cargo.caicloud.xyz/library/golang:1.12.12-stretch as build-env
+FROM cargo.caicloud.xyz/library/golang:1.12-security as build-env
 
 # Copy in the go src
 ADD . /go/src/github.com/kubeflow/katib

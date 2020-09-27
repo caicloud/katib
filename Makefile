@@ -156,7 +156,7 @@ build-linux:
 	  -e CGO_ENABLED="0"                                                               \
 	  -e GO111MODULE=on                                                                \
 	  -e GOFLAGS=" -mod=vendor"                                                        \
-	  $(BASE_REGISTRY)/golang:1.12.12-stretch                                          \
+	  $(BASE_REGISTRY)/golang:1.12-security                                          \
 	    /bin/bash -c 'for target in $(TARGETS); do                                     \
 	      go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                        \
 	        -ldflags "-s -w -X $(ROOT)/pkg/version.VERSION=$(VERSION)                  \
