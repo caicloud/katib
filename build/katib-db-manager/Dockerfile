@@ -1,4 +1,4 @@
-FROM cargo.caicloud.xyz/library/golang:1.12.12-stretch as build-env
+FROM cargo.caicloud.xyz/library/golang:1.12-security as build-env
 # The GOPATH in the image is /go.
 ADD . /go/src/github.com/kubeflow/katib
 WORKDIR /go/src/github.com/kubeflow/katib/cmd/db-manager
