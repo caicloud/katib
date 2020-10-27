@@ -2,9 +2,9 @@
 FROM cargo.caicloud.xyz/library/golang:1.12-security as build-env
 
 # Copy in the go src
-ADD . /root/go/src/github.com/kubeflow/katib
+ADD . /go/src/github.com/kubeflow/katib
 
-WORKDIR /root/go/src/github.com/kubeflow/katib/cmd/katib-controller
+WORKDIR /go/src/github.com/kubeflow/katib/cmd/katib-controller
 # Build
 RUN if [ "$(uname -m)" = "ppc64le" ]; then \
         CGO_ENABLED=0 GOOS=linux GOARCH=ppc64le go build -a -o katib-controller  ./v1alpha3; \
@@ -17,5 +17,5 @@ RUN if [ "$(uname -m)" = "ppc64le" ]; then \
 FROM cargo.caicloud.xyz/library/debian:stretch
 WORKDIR /app
 
-COPY --from=build-env /root/go/src/github.com/kubeflow/katib/cmd/katib-controller/katib-controller .
+COPY --from=build-env /go/src/github.com/kubeflow/katib/cmd/katib-controller/katib-controller .
 ENTRYPOINT ["./katib-controller"]
