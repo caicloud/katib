@@ -1,0 +1,18 @@
+{{- range $svcName, $svc := .Values.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "svc.name" ( dict "Release" $.Release "svcName" $svcName ) }}
+  namespace: {{ $.Release.Namespace | quote }}
+  {{- include "svc.labels" ( dict "commonLabels" $.Values.commonLabels "context" $ ) | indent 2 }}
+  {{- include "svc.annotations" ( dict "commonAnnotations" $.Values.commonAnnotations "context" $ ) | indent 2 }}
+spec:
+  {{- include "svc.selector" ( dict "svc" $svc "context" $ ) | indent 2 }}
+  type: {{ $svc.type }}
+  {{- include "svc.clusterIP" ( dict "svc" $svc ) | indent 2 }}
+  {{- include "svc.externalTrafficPolicy" ( dict "svc" $svc ) | indent 2 }}
+  {{- include "svc.loadBalancerSourceRanges" ( dict "svc" $svc ) | indent 2 }}
+  {{- include "svc.loadBalancerIP" ( dict "svc" $svc ) | indent 2 }}
+  {{- include "svc.ports" ( dict "svc" $svc ) | indent 2 }}
+{{- end }}

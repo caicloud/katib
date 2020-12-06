@@ -1,0 +1,71 @@
+deployments:
+  controller:
+    replicas: 1
+    containers:
+      c0:
+        image: 'clv2.cargo.io/release/katib-controller:v0.9.2'
+        imagePullPolicy: Always
+        command:
+        - ./katib-controller
+        - -cert-localfs
+        - -webhook-inject-securitycontext
+        - -enable-grpc-probe-in-suggestion=false
+        ports:
+          https:
+            containerPort: 443
+            protocol: TCP
+          https:
+            containerPort: 8080
+            protocol: TCP
+        env:
+        - name: KATIB_CORE_NAMESPACE
+          value: "default"
+        resources:
+          limits:
+            cpu: 600m
+            memory: 600Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+services:
+  controller:
+    type: ClusterIP
+    ports:
+      https:
+        port: 443
+        protocol: TCP
+        targetPort: 8443
+      http:
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+configMaps:
+  config:
+    metrics-collector-sidecar: |
+      {
+        "StdOut": {
+          "image": "clv2.cargo.io/release/file-metrics-collector:v0.9.2",
+          "imagePullPolicy": "Always"
+        },
+        "File": {
+          "image": "clv2.cargo.io/release/file-metrics-collector:v0.9.2"
+        }
+      }
+    suggestion: |
+      {
+         "random": {
+           "image": "clv2.cargo.io/release/suggestion-hyperopt:v0.9.2"
+         },
+         "grid": {
+           "image": "clv2.cargo.io/release/suggestion-chocolate:v0.9.2"
+         },
+         "hyperband": {
+           "image": "clv2.cargo.io/release/suggestion-hyperband:v0.9.2"
+         },
+         "bayesianoptimization": {
+           "image": "clv2.cargo.io/release/suggestion-skopt:v0.9.2"
+         },
+         "tpe": {
+           "image": "clv2.cargo.io/release/suggestion-hyperopt:v0.9.2"
+         }
+      }

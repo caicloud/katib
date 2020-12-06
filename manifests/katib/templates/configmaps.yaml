@@ -1,0 +1,12 @@
+{{- range $cmName, $cm := .Values.configMaps }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cm.name" ( dict "Release" $.Release "cmName" $cmName ) }}
+  namespace: {{ $.Release.Namespace | quote }}
+  {{- include "cm.labels" ( dict "commonLabels" $.Values.commonLabels "context" $ ) | indent 2 }}
+  {{- include "cm.annotations" ( dict "commonAnnotations" $.Values.commonAnnotations "context" $ ) | indent 2 }}
+data:
+{{- include "common.tplvalues.render" ( dict "value" $cm "context" $ ) | nindent 2 }}
+{{- end }}

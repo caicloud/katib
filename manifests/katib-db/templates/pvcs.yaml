@@ -1,0 +1,17 @@
+{{- range $pvcName, $pvc := .Values.pvcs }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "pvc.name" ( dict "Release" $.Release "pvcName" $pvcName ) }}
+  namespace: {{ $.Release.Namespace | quote }}
+  {{- include "pvc.labels" ( dict "commonLabels" $.Values.commonLabels "context" $ ) | indent 2 }}
+  {{- include "pvc.annotations" ( dict "commonAnnotations" $.Values.commonAnnotations "context" $ ) | indent 2 }}
+spec:
+  accessModes:
+  - {{ $pvc.accessModes | quote }}
+  resources:
+    requests:
+      storage: {{ $pvc.size | quote }}
+  storageClassName: {{ $pvc.storageClassName | quote }}
+{{- end }}
