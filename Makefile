@@ -105,7 +105,6 @@ build-local:
 	  $(CMD_DIR)/$${target};                                                           \
 	done
 
-<<<<<<< HEAD
 # Deploy Katib v1alpha3 manifests into a k8s cluster
 deployv1alpha3:
 	bash scripts/v1alpha3/deploy.sh
