@@ -155,7 +155,7 @@ build-linux:
 	  -e CGO_ENABLED="0"                                                               \
 	  -e GO111MODULE=on                                                                \
 	  -e GOFLAGS=" -mod=vendor"                                                        \
-	  $(BASE_REGISTRY)/golang:1.12-security                                          \
+	  $(BASE_REGISTRY)/golang:1.13-security                                          \
 	    /bin/bash -c 'for target in $(TARGETS); do                                     \
 	      go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                        \
 	        -ldflags "-s -w -X $(ROOT)/pkg/version.VERSION=$(VERSION)                  \
@@ -163,7 +163,7 @@ build-linux:
 	        $(CMD_DIR)/$${target};                                                     \
 	    done'
 
-container:
+container: build-linux
 	@for target in $(TARGETS); do                                                      \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
 	  docker build -t $(REGISTRY)/$${image}:$(VERSION)                                 \
