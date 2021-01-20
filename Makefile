@@ -26,11 +26,11 @@
 #
 
 # This repo's root import path (under GOPATH).
-ROOT := github.com/caicloud/clever-admin
+ROOT := github.com/kubeflow/katib
 
 # Target binaries. You can build multiple binaries for a single project.
-TARGETS := katib-controller katib-db-manager suggestion-chocolate suggestion-hyperband suggestion-hyperopt suggestion-skopt file-metricscollector
-
+TARGETS := katib-controller db-manager file-metricscollector
+SUGGESTION_TARGETS := chocolate hyperband hyperopt skopt
 # Container image prefix and suffix added to targets.
 # The final built images are:
 #   $[REGISTRY]/$[IMAGE_PREFIX]$[TARGET]$[IMAGE_SUFFIX]:$[VERSION]
@@ -153,8 +153,6 @@ build-linux:
 	  -e GOPATH=/go                                                                    \
 	  -e SHELLOPTS=$(SHELLOPTS)                                                        \
 	  -e CGO_ENABLED="0"                                                               \
-	  -e GO111MODULE=on                                                                \
-	  -e GOFLAGS=" -mod=vendor"                                                        \
 	  $(BASE_REGISTRY)/golang:1.13-security                                          \
 	    /bin/bash -c 'for target in $(TARGETS); do                                     \
 	      go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                        \
@@ -163,7 +161,24 @@ build-linux:
 	        $(CMD_DIR)/$${target};                                                     \
 	    done'
 
-container: build-linux
+build-v1alpha3:
+	@docker run --rm                                                                   \
+	  -v $(PWD):/go/src/$(ROOT)                                                        \
+	  -w /go/src/$(ROOT)                                                               \
+	  -e GOOS=linux                                                                    \
+	  -e GOARCH=amd64                                                                  \
+	  -e GOPATH=/go                                                                    \
+	  -e SHELLOPTS=$(SHELLOPTS)                                                        \
+	  -e CGO_ENABLED="0"                                                               \
+	  $(BASE_REGISTRY)/golang:1.13-security                                          \
+	    /bin/bash -c 'for target in $(TARGETS); do                                     \
+	      go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                        \
+	        -ldflags "-s -w -X $(ROOT)/pkg/version.VERSION=$(VERSION)                  \
+	          -X $(ROOT)/pkg/version.REPOROOT=$(ROOT)"                                 \
+	        $(CMD_DIR)/$${target}/v1alpha3;                                            \
+	    done'
+
+container: build-v1alpha3
 	@for target in $(TARGETS); do                                                      \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
 	  docker build -t $(REGISTRY)/$${image}:$(VERSION)                                 \
@@ -171,11 +186,24 @@ container: build-linux
 	    -f $(BUILD_DIR)/$${target}/Dockerfile .;                                       \
 	done
 
-push: container
+build-suggestion:
+	@for target in $(SUGGESTION_TARGETS); do                                           \
+	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                   \
+      docker build -t $(REGISTRY)/suggestion-$${image}:$(VERSION)                      \
+          -f $(CMD_DIR)/suggestion/$${target}/v1alpha3/Dockerfile .;                   \
+    done
+
+push-suggestion:
+	@for target in $(SUGGESTION_TARGETS); do                                           \
+	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
+      docker push -t $(REGISTRY)/suggestion-$${image}:$(VERSION)                       \
+    done
+
+push: container push-suggestion
 	@for target in $(TARGETS); do                                                      \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
 	  docker push $(REGISTRY)/$${image}:$(VERSION);                                    \
-	done
+	doneq
 
 .PHONY: clean
 clean:
