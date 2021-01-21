@@ -178,7 +178,7 @@ build-v1alpha3:
 	        $(CMD_DIR)/$${target}/v1alpha3;                                            \
 	    done'
 
-container: build-v1alpha3
+container:
 	@for target in $(TARGETS); do                                                      \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
 	  docker build -t $(REGISTRY)/$${image}:$(VERSION)                                 \
@@ -196,14 +196,15 @@ build-suggestion:
 push-suggestion:
 	@for target in $(SUGGESTION_TARGETS); do                                           \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
-      docker push -t $(REGISTRY)/suggestion-$${image}:$(VERSION)                       \
+      docker push  $(REGISTRY)/suggestion-$${image}:v0.9.2;                        \
     done
 
-push: container push-suggestion
+
+push: container
 	@for target in $(TARGETS); do                                                      \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
 	  docker push $(REGISTRY)/$${image}:$(VERSION);                                    \
-	doneq
+	done
 
 .PHONY: clean
 clean:
