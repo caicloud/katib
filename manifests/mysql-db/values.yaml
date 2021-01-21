@@ -1,0 +1,47 @@
+platformConfig:
+  imageRegistry: xxx.cargo.io
+  imageRepositoryRelease: release
+  imagePullPolicy: Always
+
+image:
+  name: mysql
+  tag: "8"
+
+args:
+  - --datadir
+  - /var/lib/mysql/datadir
+
+service:
+  type: ClusterIP
+
+serverPort:
+  name: dbapi
+  port: 3306
+
+persistentVolumeClaim:
+  name: katib-mysql
+
+secretRef:
+  name: katib-mysql-secrets
+
+readinessProbe:
+  enabled: true
+  exec:
+    command:
+      - "/bin/bash"
+      - "-c"
+      - "mysql -D ${MYSQL_DATABASE} -u root -p${MYSQL_ROOT_PASSWORD} -e 'SELECT 1'"
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 1
+
+livenessProbe:
+  enabled: true
+  exec:
+    command:
+      - "/bin/bash"
+      - "-c"
+      - "mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD}"
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5

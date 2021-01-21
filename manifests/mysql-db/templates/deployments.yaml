@@ -19,29 +19,42 @@ spec:
           {{- range $.Values.command }}
           - {{ . | quote }}
           {{- end }}
+        args:
+          {{- range $.Values.args }}
+          - {{ . | quote }}
+          {{- end }}
         env:
-          - name: DB_NAME
-            value: "mysql"
-          - name: DB_PASSWORD
+          - name: MYSQL_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: katib-mysql-secrets
+                name: {{ .Values.secretRef.name }}
                 key: MYSQL_ROOT_PASSWORD
+          - name: MYSQL_ALLOW_EMPTY_PASSWORD
+            value: "true"
+          - name: MYSQL_DATABASE
+            value: "katib"
         ports:
-        {{- if .Values.serverPort.rpc }}
+        {{- if .Values.serverPort }}
         - name: {{ .Values.serverPort.name }}
           containerPort: {{ .Values.serverPort.port }}
         {{- end }}
         resources:
           limits:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 500m
+            memory: 800Mi
           requests:
-            cpu: 50m
-            memory: 100Mi
+            cpu: 200m
+            memory: 500Mi
+        volumeMounts:
+          - name: katib-mysql
+            mountPath: /var/lib/mysql
         {{- if .Values.livenessProbe.enabled }}
         livenessProbe: {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 10 }}
         {{- end }}
         {{- if .Values.readinessProbe.enabled }}
         readinessProbe: {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 10 }}
         {{- end }}
+      volumes:
+        - name: katib-mysql
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistentVolumeClaim.name }}
