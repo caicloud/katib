@@ -1,0 +1,30 @@
+platformConfig:
+  imageRegistry: xxx.cargo.io
+  imageRepositoryRelease: release
+  imagePullPolicy: Always
+
+image:
+  name: db-manager
+
+command:
+  - './katib-db-manager'
+
+service:
+  type: ClusterIP
+
+serverPort:
+  name: api
+  port: 6789
+
+readinessProbe:
+  enabled: true
+  exec:
+    command: ["/bin/grpc_health_probe", "-addr=:6789"]
+  initialDelaySeconds: 5
+livenessProbe:
+  enabled: true
+  exec:
+    command: ["/bin/grpc_health_probe", "-addr=:6789"]
+  initialDelaySeconds: 10
+  periodSeconds: 60
+  failureThreshold: 5
