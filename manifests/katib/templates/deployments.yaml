@@ -1,25 +1,32 @@
-{{- range $deploymentName, $deployment := .Values.deployments }}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "deployment.name" ( dict "Release" $.Release "deploymentName" $deploymentName ) }}
-  namespace: {{ $.Release.Namespace | quote }}
-  {{- include "deployment.labels" ( dict "commonLabels" $.Values.commonLabels "context" $ ) | indent 2 }}
-  {{- include "deployment.annotations" ( dict "commonAnnotations" $.Values.commonAnnotations "context" $ ) | indent 2 }}
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
+  replicas: 1
   selector:
-    matchLabels: {{- include "common.labels.matchLabels" $ | nindent 6 }}
-  replicas: {{ default 1 $deployment.replicas }}
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- include "pod.labels" ( dict "podLabels" $deployment.podLabels "context" $ ) | indent 6 }}
-      {{- include "pod.annotations" ( dict "podLabels" $deployment.podAnnotations "context" $ ) | indent 6 }}
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
     spec:
-      {{- include "pod.nodeSelector" ( dict "nodeSelector" $deployment.nodeSelector "context" $ ) | indent 6 }}
-      {{- include "pod.affinity" ( dict "affinity" $deployment.affinity "context" $ ) | indent 6 }}
-      {{- include "pod.tolerations" ( dict "tolerations" $deployment.tolerations "context" $ ) | indent 6 }}
-      {{- include "pod.volumes" ( dict "volumes" $deployment.volumes "context" $ ) | indent 6 }}
-      {{- include "pod.initContainers" ( dict "initContainers" $deployment.initContainers "context" $ ) | indent 6 }}
-      {{- include "pod.containers" ( dict "containers" $deployment.containers "context" $ ) | indent 6 }}
-{{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.image) | quote }}
+        imagePullPolicy: {{ default "Always" .Values.platformConfig.imagePullPolicy | quote }}
+        command:
+          {{- range $.Values.command }}
+          - {{ . | quote }}
+          {{- end }}
+        resources:
+          limits:
+            cpu: 600m
+            memory: 600Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+          - name: KATIB_CORE_NAMESPACE
+            value: {{ .Release.Namespace | quote }}
+

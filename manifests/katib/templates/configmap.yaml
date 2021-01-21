@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMapRef.name | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+
+data:
+  metrics-collector-sidecar: |
+    {
+      "StdOut": {
+        "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.metrics_collector_sidecar.StdOut) | quote }}
+        "imagePullPolicy": "Always"
+      },
+      "File": {
+        "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.metrics_collector_sidecar.File) | quote }}
+      }
+    }
+  suggestion: |
+    {
+       "random": {
+         "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.suggestion.random) | quote }}
+       },
+       "grid": {
+         "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.suggestion.grid) | quote }}
+       },
+       "hyperband": {
+         "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.suggestion.hyperband) | quote }}
+       },
+       "bayesianoptimization": {
+         "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.suggestion.bayesianoptimization) | quote }}
+       },
+       "tpe": {
+         "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.suggestion.tpe) | quote }}
+       }
+    }

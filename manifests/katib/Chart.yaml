@@ -1,12 +1,12 @@
 # 固定值
 apiVersion: v2
 # 组件名称
-name: katib
+name: katib-controller
 # chart 描述
-description: A helm chart for katib addon
+description: A helm chart for katib-controller addon
 # 固定值
 type: application
-# chart 版本号
-version: 0.1.0
 # 组件版本号
-appVersion: v0.9.2
+appVersion: v2.0.0-alpha.3
+# chart 版本号，与组件版本号 appVersion 字段保持一致
+version: v0.9.2
