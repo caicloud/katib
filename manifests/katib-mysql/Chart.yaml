@@ -1,7 +1,7 @@
 # 固定值
 apiVersion: v2
 # 组件名称
-name: mysql-db
+name: katib-mysql
 # chart 描述
 description: A helm chart for katib-mysql-db addon
 # 固定值

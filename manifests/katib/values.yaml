@@ -4,29 +4,28 @@ platformConfig:
   imagePullPolicy: Always
 
 image:
-  name: katib-controll
+  name: katib-controller
 
 command:
   - ./katib-controller
-  - -cert-localfs
   - -webhook-inject-securitycontext
   - -enable-grpc-probe-in-suggestion=false
-
+  - --webhook-port=8443
 
 service:
   name: controller
   type: ClusterIP
 
 serverPort:
-  https:
+  webhook:
     port: 443
     targetPort: 8443
-  http:
+  metrics:
     port: 8080
     targetPort: 8080
 
 configMapRef:
-  name: config
+  name: katib-config
 
 suggestion:
   random:

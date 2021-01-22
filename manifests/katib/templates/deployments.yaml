@@ -3,6 +3,13 @@ kind: Deployment
 metadata:
   name: {{ include "common.names.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
 spec:
   replicas: 1
   selector:
@@ -29,4 +36,21 @@ spec:
         env:
           - name: KATIB_CORE_NAMESPACE
             value: {{ .Release.Namespace | quote }}
-
+        ports:
+          {{- if .Values.serverPort.webhook }}
+          - name: webhook
+            containerPort: {{ .Values.serverPort.webhook.targetPort }}
+          {{- end }}
+          {{- if .Values.serverPort.metrics }}
+          - name: metrics
+            containerPort: {{ .Values.serverPort.metrics.targetPort }}
+          {{- end }}
+        volumeMounts:
+          - mountPath: /tmp/cert
+            name: cert
+            readOnly: true
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: {{ include "common.names.fullname" . }}

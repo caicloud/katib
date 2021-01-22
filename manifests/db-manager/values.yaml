@@ -17,12 +17,12 @@ serverPort:
   port: 6789
 
 readinessProbe:
-  enabled: true
+  enabled: false
   exec:
     command: ["/bin/grpc_health_probe", "-addr=:6789"]
   initialDelaySeconds: 5
 livenessProbe:
-  enabled: true
+  enabled: false
   exec:
     command: ["/bin/grpc_health_probe", "-addr=:6789"]
   initialDelaySeconds: 10

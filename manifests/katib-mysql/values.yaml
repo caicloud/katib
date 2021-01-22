@@ -1,7 +1,6 @@
 platformConfig:
   imageRegistry: xxx.cargo.io
   imageRepositoryRelease: release
-  imagePullPolicy: Always
 
 image:
   name: mysql
