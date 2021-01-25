@@ -17,5 +17,9 @@ RUN if [ "$(uname -m)" = "ppc64le" ]; then \
 FROM cargo.caicloud.xyz/library/debian:stretch
 WORKDIR /app
 
+RUN apt-get update \
+    && apt-get install -y openssl curl \
+    && rm -rf /var/lib/apt/lists/*
+COPY hack/gencerts.sh /usr/bin/
 COPY --from=build-env /go/src/github.com/kubeflow/katib/cmd/katib-controller/katib-controller .
 ENTRYPOINT ["./katib-controller"]

@@ -1,0 +1,46 @@
+{{ if .Values.webhook.enable }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "common.names.fullname" . }}-webhook-cleanup
+  annotations:
+    "helm.sh/hook": pre-delete, pre-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  template:
+    metadata:
+      name: {{ include "common.names.fullname" . }}-webhook-cleanup
+    spec:
+      restartPolicy: OnFailure
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: clean-secret
+        image: {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.image) | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        command:
+        - "/bin/sh"
+        - "-c"
+        - "curl -ik \
+          -X DELETE \
+          -H \"Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\" \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          https://kubernetes.default.svc/api/v1/namespaces/{{ .Release.Namespace }}/secrets/katib-controller \
+          && \
+          curl -ik \
+          -X DELETE \
+          -H \"Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\" \
+          -H \"Accept: application/json\" \
+          -H \"Content-Type: application/json\" \
+          --data \"{\\\"kind\\\":\\\"DeleteOptions\\\",\\\"apiVersion\\\":\\\"batch/v1\\\",\\\"propagationPolicy\\\":\\\"Foreground\\\"}\" \
+          https://kubernetes.default.svc/apis/batch/v1/namespaces/{{ .Release.Namespace }}/jobs/{{ include "common.names.fullname" . }}-webhook-init"
+{{ end }}

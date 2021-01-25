@@ -11,6 +11,10 @@ command:
   - -webhook-inject-securitycontext
   - -enable-grpc-probe-in-suggestion=false
   - --webhook-port=8443
+  - -cert-localfs
+
+webhook:
+  enable: true
 
 service:
   name: controller
