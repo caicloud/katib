@@ -15,7 +15,7 @@ data:
   metrics-collector-sidecar: |
     {
       "StdOut": {
-        "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.metrics_collector_sidecar.StdOut) | quote }}
+        "image": {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.metrics_collector_sidecar.StdOut) | quote }},
         "imagePullPolicy": "Always"
       },
       "File": {
