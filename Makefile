@@ -97,29 +97,6 @@ test:
 	@go test -p $(CPUS) $$(go list ./... | grep -v /vendor | grep -v /test) -coverprofile=coverage.out
 	@go tool cover -func coverage.out | tail -n 1 | awk '{ print "Total coverage: " $$3 }'
 
-build-local:
-	@for target in $(TARGETS); do                                                      \
-	  CGO_ENABLED="0" go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)            \
-	  -ldflags "-s -w -X $(ROOT)/pkg/version.VERSION=$(VERSION)                        \
-	    -X $(ROOT)/pkg/version.REPOROOT=$(ROOT)"                                       \
-	  $(CMD_DIR)/$${target};                                                           \
-	done
-
-# Deploy Katib v1alpha3 manifests into a k8s cluster
-deployv1alpha3:
-	bash scripts/v1alpha3/deploy.sh
-
-# Deploy Katib v1beta1 manifests into a k8s cluster
-deploy:
-	bash scripts/v1beta1/deploy.sh
-
-# Undeploy Katib v1alpha3 manifests from a k8s cluster
-undeployv1alpha3:
-	bash scripts/v1alpha3/undeploy.sh
-
-# Undeploy Katib v1beta1 manifests from a k8s cluster
-undeploy:
-	bash scripts/v1beta1/undeploy.sh
 
 # Generate code
 generate:
@@ -144,40 +121,6 @@ prettier-check-v1alpha3:
 prettier-check:
 	npm run format:check --prefix pkg/ui/v1beta1/frontend
 
-build-linux:
-	@docker run --rm                                                                   \
-	  -v $(PWD):/go/src/$(ROOT)                                                        \
-	  -w /go/src/$(ROOT)                                                               \
-	  -e GOOS=linux                                                                    \
-	  -e GOARCH=amd64                                                                  \
-	  -e GOPATH=/go                                                                    \
-	  -e SHELLOPTS=$(SHELLOPTS)                                                        \
-	  -e CGO_ENABLED="0"                                                               \
-	  $(BASE_REGISTRY)/golang:1.13-security                                          \
-	    /bin/bash -c 'for target in $(TARGETS); do                                     \
-	      go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                        \
-	        -ldflags "-s -w -X $(ROOT)/pkg/version.VERSION=$(VERSION)                  \
-	          -X $(ROOT)/pkg/version.REPOROOT=$(ROOT)"                                 \
-	        $(CMD_DIR)/$${target};                                                     \
-	    done'
-
-build-v1alpha3:
-	@docker run --rm                                                                   \
-	  -v $(PWD):/go/src/$(ROOT)                                                        \
-	  -w /go/src/$(ROOT)                                                               \
-	  -e GOOS=linux                                                                    \
-	  -e GOARCH=amd64                                                                  \
-	  -e GOPATH=/go                                                                    \
-	  -e SHELLOPTS=$(SHELLOPTS)                                                        \
-	  -e CGO_ENABLED="0"                                                               \
-	  $(BASE_REGISTRY)/golang:1.13-security                                          \
-	    /bin/bash -c 'for target in $(TARGETS); do                                     \
-	      go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                        \
-	        -ldflags "-s -w -X $(ROOT)/pkg/version.VERSION=$(VERSION)                  \
-	          -X $(ROOT)/pkg/version.REPOROOT=$(ROOT)"                                 \
-	        $(CMD_DIR)/$${target}/v1alpha3;                                            \
-	    done'
-
 container:
 	@for target in $(TARGETS); do                                                      \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
@@ -186,14 +129,14 @@ container:
 	    -f $(BUILD_DIR)/$${target}/Dockerfile .;                                       \
 	done
 
-build-suggestion:
+container-suggestion:
 	@for target in $(SUGGESTION_TARGETS); do                                           \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                   \
       docker build -t $(REGISTRY)/suggestion-$${image}:$(VERSION)                      \
           -f $(CMD_DIR)/suggestion/$${target}/v1alpha3/Dockerfile .;                   \
     done
 
-push-suggestion:
+push-suggestion: container-suggestion
 	@for target in $(SUGGESTION_TARGETS); do                                           \
 	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
       docker push  $(REGISTRY)/suggestion-$${image}:v0.9.2;                        \
