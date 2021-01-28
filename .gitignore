@@ -8,6 +8,7 @@ __pycache__/
 # Project specific ignore files
 *.swp
 bin
+*.backup-by-hypertransformer.py
 
 # Go ignore files
 ## Binaries for programs and plugins
