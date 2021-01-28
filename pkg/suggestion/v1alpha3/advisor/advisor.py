@@ -3,7 +3,7 @@ import logging
 import json
 
 from pkg.suggestion.v1alpha3.advisor.algorithm.random_search import RandomSearchAlgorithm
-# from pkg.suggestion.v1alpha3.advisor.algorithm.grid_search import GridSearchAlgorithm
+from pkg.suggestion.v1alpha3.advisor.algorithm.grid_search import GridSearchAlgorithm
 # from pkg.suggestion.v1alpha3.advisor.algorithm.bayesian_optimization import BayesianOptimization
 # from pkg.suggestion.v1alpha3.advisor.algorithm.tpe import TpeAlgorithm
 # from pkg.suggestion.v1alpha3.advisor.algorithm.simulate_anneal import SimulateAnnealAlgorithm
@@ -37,10 +37,12 @@ class AdvisorUnifiedService(advisor_pb2_grpc.AdvisorSuggestionServicer):
         trials = request.trials
         study_configuration = self.composeConfig(experiment)
         input_trials = self.composeTrials(trials)
+        self.logger.log(INFO, "algorithm_name: %s",
+                        experiment.experiment_spec.algorithm.algorithm_name)
         if experiment.experiment_spec.algorithm.algorithm_name == "RandomSearch":
             algorithm = RandomSearchAlgorithm()
-        # elif experiment.experiment_spec.algorithm.algorithm_name == "GridSearch":
-        #     algorithm = GridSearchAlgorithm()
+        elif experiment.experiment_spec.algorithm.algorithm_name == "GridSearch":
+            algorithm = GridSearchAlgorithm()
         # elif experiment.experiment_spec.algorithm.algorithm_name == "BayesianOptimization":
         #     algorithm = BayesianOptimization()
         # elif experiment.experiment_spec.algorithm.algorithm_name == "TPE":

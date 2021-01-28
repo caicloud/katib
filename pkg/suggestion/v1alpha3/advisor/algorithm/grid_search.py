@@ -1,22 +1,16 @@
 import json
 import itertools
 
-from suggestion.models import Study
-from suggestion.models import Trial
-from suggestion.algorithm.abstract_algorithm import AbstractSuggestionAlgorithm
-
+from pkg.suggestion.v1alpha3.advisor.algorithm.abstract_algorithm import AbstractSuggestionAlgorithm
 
 class GridSearchAlgorithm(AbstractSuggestionAlgorithm):
-  def get_new_suggestions(self, study_name, trials=[], number=1):
+  def get_new_suggestions(self, study, study_configuration_json, trials=[], number=1):
     """
     Get the new suggested trials with grid search.
     """
 
     return_trial_list = []
 
-    study = Study.objects.get(name=study_name)
-
-    study_configuration_json = json.loads(study.study_configuration)
     params = study_configuration_json["params"]
     param_number = len(params)
 
@@ -56,7 +50,7 @@ class GridSearchAlgorithm(AbstractSuggestionAlgorithm):
     all_combination_number = len(all_combination_values_json)
 
     # Compute how many grid search params have been allocated
-    allocated_trials = Trial.objects.filter(study_name=study_name)
+    allocated_trials = trials
     return_trials_start_index = len(allocated_trials)
 
     if return_trials_start_index > all_combination_number:
@@ -65,10 +59,10 @@ class GridSearchAlgorithm(AbstractSuggestionAlgorithm):
       return_trials_start_index = all_combination_number - number
 
     for i in range(number):
-      trial = Trial.create(study.name, "GridSearchTrial")
-      trial.parameter_values = json.dumps(
+      trial = {}
+      trial["name"] = study["name"]
+      trial["parameter_values"] = json.dumps(
           all_combination_values_json[return_trials_start_index + i])
-      trial.save()
       return_trial_list.append(trial)
 
     return return_trial_list

@@ -22,7 +22,7 @@ spec:
     additionalMetricsNames:
       - loss
   algorithm:
-    algorithmName: RandomSearch
+    algorithmName: GridSearch
     algorithmSettings:
       - name: param1
         value: test
