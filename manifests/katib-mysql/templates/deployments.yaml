@@ -19,7 +19,7 @@ spec:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
     spec:
       containers:
-      - image: {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryRelease "imageRoot" .Values.image) | quote }}
+      - image: {{ include "common.images.image" (dict "context" $ "repository" .Values.platformConfig.imageRepositoryLibrary "imageRoot" .Values.image) | quote }}
         imagePullPolicy: {{ default "Always" .Values.platformConfig.imagePullPolicy | quote }}
         name: {{ include "common.names.fullname" . }}
         command: 
