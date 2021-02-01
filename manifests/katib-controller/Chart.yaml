@@ -9,4 +9,4 @@ type: application
 # 组件版本号
 appVersion: v0.9.2
 # chart 版本号，与组件版本号 appVersion 字段保持一致
-version: v0.9.2
+version: v2.0.0-rc.1
