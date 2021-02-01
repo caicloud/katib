@@ -7,5 +7,5 @@ description: A helm chart for katib-mysql-db addon
 # 固定值
 type: application
 # chart 版本号
-version: v2.0.0
+version: v2.0.0-rc.1
 appVersion: 5.7.20
